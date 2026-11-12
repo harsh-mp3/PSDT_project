@@ -40,6 +40,10 @@ SQLite data is stored at `backend/data/governance.db`. Tables are created and de
 
 Run `start-dev.bat` from the repository root to open separate backend and frontend terminal windows. The launcher expects Node.js and Python installed; it creates the backend venv and installs requirements the first time.
 
+## Deploy the frontend on Vercel
+
+The root `vercel.json` builds the React app from `frontend/`, publishes `frontend/dist`, and sends SPA routes to `index.html`. Connect the repository and deploy from the `main` branch. Set `VITE_API_URL` in Vercel to the base URL of a publicly reachable backend API (ending in `/api`) before redeploying; the local default `http://localhost:8000/api` only works on the developer's machine. The FastAPI backend and SQLite database need a separate host with persistent storage; this Vercel configuration deploys the frontend only.
+
 ## Main features
 
 - Eleven routed command-centre sections with responsive desktop and mobile layouts
