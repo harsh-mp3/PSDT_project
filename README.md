@@ -1,28 +1,12 @@
 # AI-Based Smart Governance and Compliance Monitoring System for Coal Mines
 
-**SIH Problem Statement:** SIH26024
-**Application:** CollieryOS demonstration command centre
+**SIH Problem Statement:** SIH26024 | **Demo:** MineSafe governance console
 
-This repository contains a React + Vite + TypeScript frontend and a FastAPI + SQLAlchemy + SQLite backend. All mine names, workers, sensor readings, thresholds, reports, and operational records are fictional. The app is a hackathon demonstration and is not an operational safety system or regulatory certification.
+This repository contains a responsive React, Vite and TypeScript demonstration. It runs without a backend: fictional operational records are stored in the browser's `localStorage`. It does not connect to real mine sensors or worker tracking.
 
-## Requirements
+## Run locally
 
-- Node.js 18+ and npm
-- Python 3.10+
-
-## Run the backend (Terminal 1)
-
-```powershell
-cd backend
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-
-On macOS/Linux activate with `source venv/bin/activate`.
-
-## Run the frontend (Terminal 2)
+Requirements: Node.js 18+ and npm.
 
 ```powershell
 cd frontend
@@ -30,35 +14,24 @@ npm install
 npm run dev
 ```
 
-- Frontend: http://localhost:5173
-- Backend health: http://localhost:8000/health
-- API docs: http://localhost:8000/docs
+Open http://localhost:5173. Run `npm run build` to create the deployable production bundle in `frontend/dist`.
 
-SQLite data is stored at `backend/data/governance.db`. Tables are created and demo records seeded on first startup; user updates persist across refreshes and backend restarts. The database file is excluded from version control.
+On Windows, `start-dev.bat` opens the frontend development server for you.
 
-## Windows convenience launcher
+## Deploy to Vercel
 
-Run `start-dev.bat` from the repository root to open separate backend and frontend terminal windows. The launcher expects Node.js and Python installed; it creates the backend venv and installs requirements the first time.
+Import this GitHub repository. Vercel uses the root `vercel.json` to install and build the frontend and to route nested React Router paths back to the SPA. No backend URL, environment variables, or API keys are required.
 
-## Deploy the frontend on Vercel
+## Prototype features
 
-The root `vercel.json` builds the React app from `frontend/`, publishes `frontend/dist`, and sends SPA routes to `index.html`. Connect the repository and deploy from the `main` branch. Set `VITE_API_URL` in Vercel to the base URL of a publicly reachable backend API (ending in `/api`) before redeploying; the local default `http://localhost:8000/api` only works on the developer's machine. The FastAPI backend and SQLite database need a separate host with persistent storage; this Vercel configuration deploys the frontend only.
+- Eleven routed command-centre sections with responsive layouts
+- Overview KPIs, sensor cards, charts, tunnel risk table and activity summaries
+- Simulated sensor readings that update while the demo is running, with pause/resume and breach controls
+- Interactive SVG tunnel schematic, risk and alert register, hazard workflow, worker directory, inspections, compliance checklist and reports
+- In-browser record persistence, notifications, CSV export, and print-to-PDF
 
-For a demo backend, `render.yaml` defines a Render FastAPI web service and PostgreSQL database. In Render, create a Blueprint from this repository and apply the `render.yaml`. After it is live, copy the service's `onrender.com` origin into Vercel's `VITE_API_URL` as `https://<service>.onrender.com/api`, then redeploy the frontend. The Blueprint uses Render's free Postgres plan, which expires after 30 days; choose durable hosted storage for a long-lived deployment. Free Render web services can spin down while idle; the frontend allows up to 75 seconds for production API requests to accommodate a cold start. When the frontend is built for production without `VITE_API_URL`, it no longer tries to contact the visitor's own `localhost`; it shows this deployment instruction instead.
+## Demo and safety notice
 
-## Main features
+All mine names, workers, readings, thresholds, reports and operational records are fictional. Thresholds are illustrative and are not approved operating limits. This software does not track physical workers, connect to certified instruments, predict accidents, certify statutory compliance, or send SMS, email, WhatsApp, push or emergency messages.
 
-- Eleven routed command-centre sections with responsive desktop and mobile layouts
-- SQLite-backed overview, fictional workforce directory, tunnel schematic, sensor channels, hazard workflow, alerts, inspections, compliance checklist, notification feed, activity log, and reports
-- Live-style sensor simulation updates every five seconds, with pause/resume, reset, configurable illustrative thresholds shown in the interface, and a demo threshold-breach workflow
-- Breach workflow updates tunnel risk, sensor state, alert, in-app notification, reading history, and activity log in the database
-- Hazard and inspection creation, status transitions, alert acknowledge/assign/escalate/resolve, editable illustrative sensor thresholds, compliance document uploads, notification read state, CSV downloads for operational tables, and print-to-PDF reports
-- API-unavailable state with an explicit retry action; the frontend does not substitute mock operational API responses
-
-## Configuration
-
-Copy `backend/.env.example` to `backend/.env` to override `DATABASE_URL`. Frontend API base URL defaults to `http://localhost:8000/api`; set `VITE_API_URL` in `frontend/.env` to override it.
-
-## Safety and privacy boundary
-
-No physical sensors, GPS tracking, SMS, WhatsApp, push messaging, statutory submissions, accident prediction, or certified safety controls are implemented. Real mine use requires certified instrumentation, validated limits, approved operational procedures, and safety testing.
+The `backend/` directory is retained as earlier prototype code and is not required by the current frontend demo.
