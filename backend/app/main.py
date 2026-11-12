@@ -5,6 +5,7 @@ from sqlalchemy import desc
 from typing import Optional
 from pathlib import Path
 import uuid
+import os
 from app.database import Base, engine, get_db
 from app.models import *
 from app.services.seed import seed
@@ -12,7 +13,8 @@ from app.schemas import Payload
 Base.metadata.create_all(bind=engine)
 with next(get_db()) as db: seed(db)
 app=FastAPI(title='Coal Mine Smart Governance API',version='1.0.0',description='Fictional SIH26024 demonstration API')
-app.add_middleware(CORSMiddleware,allow_origins=['http://localhost:5173','http://127.0.0.1:5173'],allow_credentials=True,allow_methods=['*'],allow_headers=['*'])
+cors_origins=os.getenv('CORS_ORIGINS','http://localhost:5173,http://127.0.0.1:5173').split(',')
+app.add_middleware(CORSMiddleware,allow_origins=[origin.strip() for origin in cors_origins if origin.strip()],allow_credentials=True,allow_methods=['*'],allow_headers=['*'])
 def serialize(obj):
     out={c.name:getattr(obj,c.name) for c in obj.__table__.columns}
     for k,v in out.items():

@@ -44,6 +44,8 @@ Run `start-dev.bat` from the repository root to open separate backend and fronte
 
 The root `vercel.json` builds the React app from `frontend/`, publishes `frontend/dist`, and sends SPA routes to `index.html`. Connect the repository and deploy from the `main` branch. Set `VITE_API_URL` in Vercel to the base URL of a publicly reachable backend API (ending in `/api`) before redeploying; the local default `http://localhost:8000/api` only works on the developer's machine. The FastAPI backend and SQLite database need a separate host with persistent storage; this Vercel configuration deploys the frontend only.
 
+For a demo backend, `render.yaml` defines a Render FastAPI web service and PostgreSQL database. In Render, create a Blueprint from this repository and apply the `render.yaml`. After it is live, copy the service's `onrender.com` origin into Vercel's `VITE_API_URL` as `https://<service>.onrender.com/api`, then redeploy the frontend. The Blueprint uses Render's free Postgres plan, which expires after 30 days; choose durable hosted storage for a long-lived deployment. Free Render web services can also spin down while idle. When the frontend is built for production without `VITE_API_URL`, it no longer tries to contact the visitor's own `localhost`; it shows this deployment instruction instead.
+
 ## Main features
 
 - Eleven routed command-centre sections with responsive desktop and mobile layouts
