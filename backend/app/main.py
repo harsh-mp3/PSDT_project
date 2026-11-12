@@ -23,7 +23,7 @@ def serialize(obj):
 def list_rows(model,db): return [serialize(x) for x in db.query(model).order_by(desc(model.id)).all()]
 def log(db,msg,cat='Operations',actor='Control room'): db.add(Activity(message=msg,category=cat,actor=actor))
 @app.get('/health')
-def health(): return {'status':'ok','mode':'simulated demonstration','database':'sqlite'}
+def health(): return {'status':'ok','mode':'simulated demonstration','database':engine.dialect.name}
 @app.get('/api/summary')
 def summary(db:Session=Depends(get_db)):
     tunnels=db.query(Tunnel).all(); alerts=db.query(Alert).filter(Alert.status!='Resolved').count(); hazards=db.query(Hazard).filter(Hazard.status!='Verified').count(); tasks=db.query(Compliance).filter(Compliance.status!='Complete').count()
