@@ -2,7 +2,9 @@ import type { Resource, Row } from '../types'
 
 // Frontend-only prototype store. No network requests or physical sensors are used.
 const STORAGE_KEY = 'minesafe-demo-v1'
+const HISTORY_KEY = `${STORAGE_KEY}-sensor-history`
 type Store = Record<Resource, Row[]>
+type ReadingSample = { id: string; tunnel: string; sensor: string; value: number; time: string }
 
 const initial: Store = {
   mines: [{ id: 1, name: 'Jharia Coalfield', code: 'JCF-01' }],
@@ -68,8 +70,29 @@ function writeStore(store: Store) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(store)) } catch { /* Private browsing may disable storage. */ }
 }
 let store = readStore()
+function readHistory(): ReadingSample[] {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]') as ReadingSample[] } catch { return [] }
+}
+let history = readHistory()
 const persist = () => writeStore(store)
 const stamp = () => new Date().toISOString()
+const persistHistory = () => { try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)) } catch { /* Browser storage can be unavailable in private mode. */ } }
+const recordReadings = (time = stamp()) => {
+  for (const sensor of store.sensors) history.push({ id: `${sensor.tunnel}-${sensor.type}-${Date.now()}-${Math.random()}`, tunnel: String(sensor.tunnel), sensor: String(sensor.type), value: Number(sensor.value), time })
+  history = history.slice(-36 * 120)
+  persistHistory()
+}
+if (history.length === 0) {
+  const now = Date.now()
+  for (const sensor of store.sensors) {
+    const amp = sensor.type === 'CO' ? 0.38 : sensor.type === 'TEMP' ? 0.24 : sensor.type === 'HUM' ? 0.9 : sensor.type === 'O2' ? 0.055 : 0.025
+    for (let i = 29; i >= 0; i--) {
+      const value = Math.max(0, Number((Number(sensor.value) + Math.sin(i * 0.53 + Number(sensor.id)) * amp + Math.cos(i * 0.21) * amp * 0.35).toFixed(2)))
+      history.push({ id: `${sensor.tunnel}-${sensor.type}-seed-${i}`, tunnel: String(sensor.tunnel), sensor: String(sensor.type), value, time: new Date(now - i * 5000).toISOString() })
+    }
+  }
+  persistHistory()
+}
 const log = (title: string, detail: string) => { store.activity.unshift({ id: Date.now(), title, detail, time: stamp() }); store.activity = store.activity.slice(0, 100) }
 const notify = (title: string, message: string, tunnel: string, severity = 'Info') => store.notifications.unshift({ id: Date.now() + Math.random(), title, message, tunnel, severity, read: false, time: stamp() })
 
@@ -99,6 +122,7 @@ export const simulate = async (tunnel: string, sensor: string, threshold?: numbe
   if (!reading) throw new Error('Sensor channel not found')
   const configured = Number(threshold || 1)
   reading.value = Number((configured * 1.12).toFixed(2)); reading.status = 'Critical'; reading.updated = stamp()
+  recordReadings(reading.updated)
   const target = store.tunnels.find(row => row.code === tunnel)
   if (target) target.risk = 'Critical'
   const title = `${sensor} demo threshold breach`
@@ -110,9 +134,15 @@ export const simulate = async (tunnel: string, sensor: string, threshold?: numbe
 export const resetSimulation = async () => {
   store = structuredClone(initial)
   persist()
+  history = []
+  const now = Date.now()
+  for (const sensor of store.sensors) {
+    for (let i = 29; i >= 0; i--) history.push({ id: `${sensor.tunnel}-${sensor.type}-seed-${i}`, tunnel: String(sensor.tunnel), sensor: String(sensor.type), value: Number(sensor.value), time: new Date(now - i * 5000).toISOString() })
+  }
+  persistHistory()
   return true
 }
-export const getReadings = async () => ({ items: store.sensors.map(row => ({ ...row, sensor: row.type, time: row.updated || stamp() })), simulated: true })
+export const getReadings = async () => ({ items: store.sensors.map(row => ({ ...row, sensor: row.type, time: row.updated || stamp() })), history: history.map(point => ({ ...point })), simulated: true })
 export const tickSimulation = async () => {
   store.sensors = store.sensors.map(row => {
     if (row.status === 'Critical') return row
@@ -120,5 +150,6 @@ export const tickSimulation = async () => {
     const value = Math.max(0, Number((Number(row.value) + delta).toFixed(2)))
     return { ...row, value, updated: stamp() }
   })
+  recordReadings()
   persist()
 }
