@@ -56,17 +56,17 @@ const initial: Store = {
     ]),
   ],
   alerts: [
-    { id: 1, title: 'Methane reading above demo threshold', tunnel: 'E', severity: 'Critical', source: 'CH4 sensor', assigned: 'P. Roy', status: 'Acknowledged', time: new Date(Date.now() - 3600000).toISOString(), notes: '' },
+    { id: 1, title: 'Methane reading above configured threshold', tunnel: 'E', severity: 'Critical', source: 'CH4 sensor', assigned: 'P. Roy', status: 'Acknowledged', time: new Date(Date.now() - 3600000).toISOString(), notes: '' },
     { id: 2, title: 'Ventilation trend requires review', tunnel: 'B', severity: 'Warning', source: 'AIR sensor', assigned: 'S. Das', status: 'New', time: new Date(Date.now() - 7200000).toISOString(), notes: '' },
   ],
   hazards: [
-    { id: 1, title: 'Loose material near support frame', category: 'Ground control', description: 'Demo observation for follow-up inspection.', tunnel: 'B', priority: 'High', reporter: 'S. Das', assigned: 'S. Das', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
+    { id: 1, title: 'Loose material near support frame', category: 'Ground control', description: 'Observation recorded for follow-up inspection.', tunnel: 'B', priority: 'High', reporter: 'S. Das', assigned: 'S. Das', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
     { id: 2, title: 'Water accumulation at crosscut', category: 'Housekeeping', description: 'Illustrative fictional hazard record.', tunnel: 'D', priority: 'Medium', reporter: 'M. Ali', assigned: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'Assigned' },
-    { id: 3, title: 'Loose roof bolt near longwall face', category: 'Ground control', description: 'Routine demo inspection flagged a loose roof bolt near the active face. Isolate the marked bay and request a support inspection before work resumes.', tunnel: 'C', priority: 'High', reporter: 'Dev Patel', assigned: 'R. Singh', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
+    { id: 3, title: 'Loose roof bolt near longwall face', category: 'Ground control', description: 'Routine inspection flagged a loose roof bolt near the active face. Isolate the marked bay and request a support inspection before work resumes.', tunnel: 'C', priority: 'High', reporter: 'Dev Patel', assigned: 'R. Singh', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
     { id: 4, title: 'Ventilation duct separation at crosscut', category: 'Ventilation', description: 'A joint in the auxiliary duct appears separated, which may reduce airflow at the working end. Ventilation team follow-up is recorded for the next shift check.', tunnel: 'A', priority: 'High', reporter: 'Rohan Kumar', assigned: 'A. Kumar', date: new Date().toISOString().slice(0, 10), status: 'Action in Progress' },
-    { id: 5, title: 'Insulation wear on trailing cable', category: 'Electrical', description: 'Demo walk-through noted worn insulation on a trailing equipment cable. Keep the cable out of service pending an electrical inspection and repair record.', tunnel: 'E', priority: 'High', reporter: 'Mira Das', assigned: 'P. Roy', date: new Date().toISOString().slice(0, 10), status: 'Assigned' },
+    { id: 5, title: 'Insulation wear on trailing cable', category: 'Electrical', description: 'Walk-through noted worn insulation on a trailing equipment cable. Keep the cable out of service pending an electrical inspection and repair record.', tunnel: 'E', priority: 'High', reporter: 'Mira Das', assigned: 'P. Roy', date: new Date().toISOString().slice(0, 10), status: 'Assigned' },
     { id: 6, title: 'Conveyor transfer guard needs refitting', category: 'Equipment', description: 'A transfer-point guard was reported loose after routine housekeeping. Maintenance should refit the guard and record a visual check before restart.', tunnel: 'D', priority: 'Medium', reporter: 'Kiara Sen', assigned: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'Reported' },
-    { id: 7, title: 'Emergency egress route partially obstructed', category: 'Emergency readiness', description: 'Stored material is narrowing the marked egress route in this demo report. Clear the route and confirm the muster direction remains visible.', tunnel: 'F', priority: 'High', reporter: 'Meera Iyer', assigned: 'N. Sharma', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
+    { id: 7, title: 'Emergency egress route partially obstructed', category: 'Emergency readiness', description: 'Stored material is narrowing the marked egress route in this report. Clear the route and confirm the muster direction remains visible.', tunnel: 'F', priority: 'High', reporter: 'Meera Iyer', assigned: 'N. Sharma', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
   ],
   workers: [
     { id: 1, worker_id: 'JCF-1042', name: 'Arjun Mehta', designation: 'Mining Supervisor', tunnel: 'A', shift: 'Day', supervisor: 'A. Kumar', emergency_contact: '+91 90000 10042', muster: 'North Muster Point', read: true },
@@ -77,10 +77,10 @@ const initial: Store = {
   ],
   inspections: [
     { id: 1, title: 'Weekly ventilation walkthrough', tunnel: 'B', inspector: 'S. Das', date: new Date(Date.now() + 86400000).toISOString().slice(0, 10), status: 'Scheduled', findings: '', corrective_action: '' },
-    { id: 2, title: 'Ground support review', tunnel: 'E', inspector: 'P. Roy', date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'Demo follow-up required', corrective_action: 'Review support plan' },
+    { id: 2, title: 'Ground support review', tunnel: 'E', inspector: 'P. Roy', date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'Follow-up required', corrective_action: 'Review support plan' },
     { id: 3, title: 'Pre-shift ventilation and airflow survey', tunnel: 'A', inspector: 'A. Kumar', date: new Date(Date.now() + 86400000).toISOString().slice(0, 10), status: 'Scheduled', findings: 'Check airflow readings at the working face and confirm auxiliary duct continuity.', corrective_action: 'Record readings and assign any ventilation adjustment before the next shift.' },
-    { id: 4, title: 'Roof bolt and strata condition examination', tunnel: 'C', inspector: 'R. Singh', date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'One support point needs a closer visual check; no real site condition is represented by this demo record.', corrective_action: 'Keep the marked bay under review and document support verification.' },
-    { id: 5, title: 'Crosscut drainage and pump function check', tunnel: 'D', inspector: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'In Progress', findings: 'Inspect the crosscut for water accumulation and verify the simulated pump checklist.', corrective_action: 'Clear any obstruction and record pump status in the next handover.' },
+    { id: 4, title: 'Roof bolt and strata condition examination', tunnel: 'C', inspector: 'R. Singh', date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'One support point needs a closer visual check. This record is illustrative and does not describe a real site condition.', corrective_action: 'Keep the marked bay under review and document support verification.' },
+    { id: 5, title: 'Crosscut drainage and pump function check', tunnel: 'D', inspector: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'In Progress', findings: 'Inspect the crosscut for water accumulation and verify the pump checklist.', corrective_action: 'Clear any obstruction and record pump status in the next handover.' },
     { id: 6, title: 'Electrical cable and equipment isolation audit', tunnel: 'E', inspector: 'P. Roy', date: new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 10), status: 'Scheduled', findings: 'Review cable condition, isolation tags and the equipment inspection register.', corrective_action: 'Log defects and route items requiring repair to the electrical supervisor.' },
     { id: 7, title: 'Emergency egress and wayfinding review', tunnel: 'F', inspector: 'N. Sharma', date: new Date().toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'Check that the illustrative egress route is clear and route markers remain visible.', corrective_action: 'Record clearance confirmation and update the shift briefing notes.' },
   ],
@@ -89,8 +89,8 @@ const initial: Store = {
     { id: 2, title: 'Emergency drill record', category: 'Internal checklist', owner: 'S. Das', due: new Date(Date.now() + 86400000 * 8).toISOString().slice(0, 10), priority: 'Medium', status: 'In Progress' },
     { id: 3, title: 'Shift handover register', category: 'Document register', owner: 'P. Roy', due: new Date().toISOString().slice(0, 10), priority: 'Low', status: 'Complete' },
   ],
-  notifications: [{ id: 1, title: 'Demo methane alert acknowledged', message: 'Supervisor P. Roy acknowledged the illustrative threshold event.', tunnel: 'E', severity: 'Critical', read: false, time: new Date(Date.now() - 3600000).toISOString() }],
-  activity: [{ id: 1, title: 'Demo workspace initialized', detail: 'Fictional local records loaded.', time: new Date().toISOString() }],
+  notifications: [{ id: 1, title: 'Methane alert acknowledged', message: 'Supervisor P. Roy acknowledged the illustrative threshold event.', tunnel: 'E', severity: 'Critical', read: false, time: new Date(Date.now() - 3600000).toISOString() }],
+  activity: [{ id: 1, title: 'Workspace initialized', detail: 'Fictional local records loaded.', time: new Date().toISOString() }],
 }
 
 function readStore(): Store {
@@ -148,7 +148,7 @@ if (history.length === 0) {
 const log = (title: string, detail: string) => { store.activity.unshift({ id: Date.now(), title, detail, time: stamp() }); store.activity = store.activity.slice(0, 100) }
 const notify = (title: string, message: string, tunnel: string, severity = 'Info') => store.notifications.unshift({ id: Date.now() + Math.random(), title, message, tunnel, severity, read: false, time: stamp() })
 
-export const api = { defaults: { baseURL: 'local demo storage' } }
+export const api = { defaults: { baseURL: 'local storage' } }
 export const list = async (resource: Resource) => store[resource].map(row => ({ ...row }))
 export const create = async (resource: Resource, data: Record<string, unknown>) => {
   const row = { id: Date.now(), ...data } as Row
@@ -177,10 +177,10 @@ export const simulate = async (tunnel: string, sensor: string, threshold?: numbe
   recordReadings(reading.updated)
   const target = store.tunnels.find(row => row.code === tunnel)
   if (target) target.risk = 'Critical'
-  const title = `${sensor} demo threshold breach`
+  const title = `${sensor} threshold breach`
   store.alerts.unshift({ id: Date.now(), title, tunnel, severity: 'Critical', source: `${sensor} sensor`, assigned: target?.supervisor || 'Unassigned', status: 'New', time: stamp(), notes: '' })
-  notify('Critical simulated sensor event', `${sensor} reading exceeded the illustrative threshold in Section ${tunnel}.`, tunnel, 'Critical')
-  log('Threshold event simulated', `${sensor} · Section ${tunnel} · ${reading.value} ${reading.unit}`)
+  notify('Critical sensor event', `${sensor} reading exceeded the illustrative threshold in Section ${tunnel}.`, tunnel, 'Critical')
+  log('Threshold event recorded', `${sensor} · Section ${tunnel} · ${reading.value} ${reading.unit}`)
   persist(); return { reading: { ...reading }, tunnel: target }
 }
 export const resetSimulation = async () => {
@@ -194,7 +194,7 @@ export const resetSimulation = async () => {
   persistHistory()
   return true
 }
-export const getReadings = async () => ({ items: store.sensors.map(row => ({ ...row, sensor: row.type, time: row.updated || stamp() })), history: history.map(point => ({ ...point })), simulated: true })
+export const getReadings = async () => ({ items: store.sensors.map(row => ({ ...row, sensor: row.type, time: row.updated || stamp() })), history: history.map(point => ({ ...point })) })
 export const tickSimulation = async () => {
   store.sensors = store.sensors.map(row => {
     if (row.status === 'Critical') return row
