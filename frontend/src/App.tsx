@@ -81,7 +81,14 @@ function Monitoring({data,onSim,onReset,busy,paused,setPaused,refresh}:{data:Rec
   const maxValue=values.length?Math.max(...values):Number(record.value)
   const avgValue=values.length?values.reduce((sum,value)=>sum+value,0)/values.length:Number(record.value)
   const section=data.tunnels?.find(item=>item.code===tunnel)
-  const channelRows=sensorDefs.map(([code,name,channelUnit,defaultThreshold])=>({code,name,unit:channelUnit,threshold:defaultThreshold,reading:(data.sensors||[]).find(item=>item.tunnel===tunnel&&item.type===code)}))
+  const channelRows=sensorDefs.map(([code,name,channelUnit,defaultThreshold])=>({
+    code,name,unit:channelUnit,threshold:defaultThreshold,
+    reading:(data.sensors||[]).find(item=>item.tunnel===tunnel&&item.type===code),
+    points:history.filter(point=>point.tunnel===tunnel&&point.sensor===code&&Date.now()-new Date(point.time).getTime()<=range*1000).map(point=>({
+      label:new Date(point.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+      value:Number(point.value),
+    })),
+  }))
   const selectSensor=(code:string)=>{setSensor(code);setThreshold(Number(sensorDefs.find(item=>item[0]===code)?.[3]||1))}
   const refreshNow=async()=>{await tickSimulation();await refresh()}
   const selectedAlert=(data.alerts||[]).find(item=>item.tunnel===tunnel&&(item.source||'').toLowerCase().includes(sensor.toLowerCase()))
@@ -133,7 +140,16 @@ function Monitoring({data,onSim,onReset,busy,paused,setPaused,refresh}:{data:Rec
               <button className="channel-select" onClick={()=>selectSensor(channel.code)} aria-pressed={sensor===channel.code}>
                 <span className="channel-name">{channel.name}<small>{channel.code}</small></span><Badge value={String(current.status||'Normal')}/>
                 <strong>{Number(current.value).toFixed(channel.code==='CO'||channel.code==='HUM'?1:2)} <em>{channel.unit}</em></strong>
-                <small>Demo limit {channel.threshold} {channel.unit}</small>
+                <span className="channel-chart-caption">LIVE TREND · {channel.points.length} SAMPLES</span>
+                <div className="channel-sparkline" role="img" aria-label={`${channel.name} trend for section ${tunnel}`}><ResponsiveContainer width="100%" height="100%"><LineChart data={channel.points} margin={{top:6,right:4,bottom:2,left:4}}>
+                  <CartesianGrid stroke="#273033" strokeDasharray="3 5" vertical={false}/>
+                  <XAxis dataKey="label" hide/>
+                  <YAxis hide domain={['auto','auto']}/>
+                  <Tooltip labelFormatter={label=>label} formatter={value=>[`${Number(value).toFixed(2)} ${channel.unit}`,channel.name]} contentStyle={{background:'#171e20',border:'1px solid #3b4648',fontSize:10}}/>
+                  <ReferenceLine y={channel.code===sensor?threshold:channel.threshold} stroke="#d75b50" strokeDasharray="4 4"/>
+                  <Line type="monotone" dataKey="value" stroke={current.status==='Critical'?'#e36b5f':sensor===channel.code?'#dda13e':'#78a987'} strokeWidth={1.8} dot={false} activeDot={{r:3}} isAnimationActive={false}/>
+                </LineChart></ResponsiveContainer></div>
+                <small>Demo limit {channel.code===sensor?threshold:channel.threshold} {channel.unit}</small>
               </button>
               <button className="channel-details" onClick={()=>{selectSensor(channel.code);setDetailsOpen(true)}}>Details <ChevronDown size={12}/></button>
             </article>
