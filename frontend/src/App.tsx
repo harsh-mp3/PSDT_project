@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import type * as React from 'react'
 import { NavLink, Route, Routes, useLocation } from 'react-router-dom'
-import { Activity, AlertTriangle, Bell, ChevronDown, ClipboardCheck, FileBarChart, Gauge, HardHat, LayoutDashboard, Map, Menu, Radio, Settings, ShieldCheck, Siren, Users, X, Search, Plus, RefreshCw, Pause, Play, Check, Download, Wifi, WifiOff, Maximize2 } from 'lucide-react'
+import { Activity, AlertTriangle, Bell, ChevronDown, ClipboardCheck, FileBarChart, Gauge, HardHat, LayoutDashboard, Map, Menu, Radio, ShieldCheck, Siren, Users, X, Search, Plus, RefreshCw, Pause, Play, Check, Download, Wifi, WifiOff, Maximize2 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, PieChart, Pie, Cell, LineChart, Line, ReferenceLine } from 'recharts'
 import { create, getReadings, list, resetSimulation, simulate, tickSimulation, update } from './services/api'
 import type { Resource, Row } from './types'
 
 const nav = [
-  ['/','Overview',LayoutDashboard],['/monitoring','Live Monitoring',Radio],['/map','Mine Tunnel Map',Map],['/alerts','Risk & Alerts',Siren],['/hazards','Hazard Management',AlertTriangle],['/workers','Worker Safety',Users],['/inspections','Inspection Management',ClipboardCheck],['/compliance','Compliance Centre',ShieldCheck],['/reports','Reports & Analytics',FileBarChart],['/notifications','Notification Centre',Bell],['/settings','Settings',Settings],
+  ['/','Overview',LayoutDashboard],['/monitoring','Live Monitoring',Radio],['/map','Mine Tunnel Map',Map],['/alerts','Risk & Alerts',Siren],['/hazards','Hazard Management',AlertTriangle],['/workers','Worker Safety',Users],['/inspections','Inspection Management',ClipboardCheck],['/compliance','Compliance Centre',ShieldCheck],['/reports','Reports & Analytics',FileBarChart],['/notifications','Notification Centre',Bell],
 ] as const
 const meta:Record<string,{title:string;sub:string;resource?:Resource;fields:string[]}>={
   '/alerts':{title:'Risk & Alerts',sub:'Threshold events and supervisor response workflow.',resource:'alerts',fields:['title','tunnel','severity','assigned','status','time','notes']},
