@@ -150,11 +150,32 @@ const notify = (title: string, message: string, tunnel: string, severity = 'Info
 
 export const api = { defaults: { baseURL: 'local storage' } }
 export const list = async (resource: Resource) => store[resource].map(row => ({ ...row }))
+export const syncHazardNotifications = async () => {
+  for (const hazard of store.hazards) {
+    const highRisk = /high|critical/i.test(String(hazard.priority || ''))
+    const existing = store.notifications.find(notification => Number(notification.hazardId) === Number(hazard.id))
+      || (highRisk ? store.notifications.find(notification => !notification.hazardId && notification.message === hazard.title && String(notification.tunnel) === String(hazard.tunnel)) : undefined)
+    if (!highRisk && !existing) continue
+    const resolved = /resolved|verified/i.test(String(hazard.status || ''))
+    const fields = {
+      title: highRisk ? `${hazard.priority} hazard · ${hazard.title}` : `Hazard priority updated · ${hazard.title}`,
+      message: `${hazard.category || 'Hazard'} in Section ${hazard.tunnel}. Status: ${hazard.status || 'Reported'}. Assigned to ${hazard.assigned || 'Supervisor pending'}.`,
+      tunnel: String(hazard.tunnel || 'A'),
+      severity: String(hazard.priority || 'High'),
+      read: resolved || !highRisk ? true : existing?.read ?? false,
+      time: existing?.time || stamp(),
+      hazardId: hazard.id,
+    }
+    if (existing) Object.assign(existing, fields)
+    else store.notifications.unshift({ id: Date.now() + Math.random(), ...fields })
+  }
+  persist()
+}
 export const create = async (resource: Resource, data: Record<string, unknown>) => {
   const row = { id: Date.now(), ...data } as Row
   store[resource].unshift(row)
   const tunnel = String(data.tunnel || 'A')
-  if (resource === 'hazards') { log('Hazard reported', `${data.title || 'New hazard'} · Section ${tunnel}`); notify('New hazard reported', String(data.title || 'A hazard was registered.'), tunnel, String(data.priority || 'Warning')) }
+  if (resource === 'hazards') { log('Hazard reported', `${data.title || 'New hazard'} · Section ${tunnel}`); if (!/high|critical/i.test(String(data.priority || ''))) notify('New hazard reported', String(data.title || 'A hazard was registered.'), tunnel, String(data.priority || 'Warning')) }
   else if (resource === 'inspections') log('Inspection scheduled', `${data.title || 'Inspection'} · Section ${tunnel}`)
   else if (resource === 'compliance') log('Compliance action added', String(data.title || 'New internal checklist item'))
   persist(); return { ...row }
@@ -165,6 +186,7 @@ export const update = async (resource: Resource, id: number, data: Record<string
   store[resource][index] = { ...store[resource][index], ...data }
   const row = store[resource][index]
   if (resource === 'alerts' && data.status) log(`Alert ${String(data.status).toLowerCase()}`, String(row.title || `Alert ${id}`))
+  if (resource === 'hazards') await syncHazardNotifications()
   if (resource === 'compliance' && data.status === 'Complete') { log('Compliance action completed', String(row.title)); notify('Compliance action completed', String(row.title), String(row.tunnel || 'A')) }
   if (data.assigned) { log('Supervisor assigned', `${String(data.assigned)} · ${String(row.title || resource)}`); notify('Action assigned', `${String(row.title || resource)} assigned to ${String(data.assigned)}.`, String(row.tunnel || 'A'), 'Warning') }
   persist(); return { ...row }
