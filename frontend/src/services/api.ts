@@ -62,6 +62,11 @@ const initial: Store = {
   hazards: [
     { id: 1, title: 'Loose material near support frame', category: 'Ground control', description: 'Demo observation for follow-up inspection.', tunnel: 'B', priority: 'High', reporter: 'S. Das', assigned: 'S. Das', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
     { id: 2, title: 'Water accumulation at crosscut', category: 'Housekeeping', description: 'Illustrative fictional hazard record.', tunnel: 'D', priority: 'Medium', reporter: 'M. Ali', assigned: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'Assigned' },
+    { id: 3, title: 'Loose roof bolt near longwall face', category: 'Ground control', description: 'Routine demo inspection flagged a loose roof bolt near the active face. Isolate the marked bay and request a support inspection before work resumes.', tunnel: 'C', priority: 'High', reporter: 'Dev Patel', assigned: 'R. Singh', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
+    { id: 4, title: 'Ventilation duct separation at crosscut', category: 'Ventilation', description: 'A joint in the auxiliary duct appears separated, which may reduce airflow at the working end. Ventilation team follow-up is recorded for the next shift check.', tunnel: 'A', priority: 'High', reporter: 'Rohan Kumar', assigned: 'A. Kumar', date: new Date().toISOString().slice(0, 10), status: 'Action in Progress' },
+    { id: 5, title: 'Insulation wear on trailing cable', category: 'Electrical', description: 'Demo walk-through noted worn insulation on a trailing equipment cable. Keep the cable out of service pending an electrical inspection and repair record.', tunnel: 'E', priority: 'High', reporter: 'Mira Das', assigned: 'P. Roy', date: new Date().toISOString().slice(0, 10), status: 'Assigned' },
+    { id: 6, title: 'Conveyor transfer guard needs refitting', category: 'Equipment', description: 'A transfer-point guard was reported loose after routine housekeeping. Maintenance should refit the guard and record a visual check before restart.', tunnel: 'D', priority: 'Medium', reporter: 'Kiara Sen', assigned: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'Reported' },
+    { id: 7, title: 'Emergency egress route partially obstructed', category: 'Emergency readiness', description: 'Stored material is narrowing the marked egress route in this demo report. Clear the route and confirm the muster direction remains visible.', tunnel: 'F', priority: 'High', reporter: 'Meera Iyer', assigned: 'N. Sharma', date: new Date().toISOString().slice(0, 10), status: 'Under Review' },
   ],
   workers: [
     { id: 1, worker_id: 'JCF-1042', name: 'Arjun Mehta', designation: 'Mining Supervisor', tunnel: 'A', shift: 'Day', supervisor: 'A. Kumar', emergency_contact: '+91 90000 10042', muster: 'North Muster Point', read: true },
@@ -90,11 +95,14 @@ function readStore(): Store {
       const restored = { ...structuredClone(initial), ...JSON.parse(saved) } as Store
       const savedWorkerIds = new Set((restored.workers || []).map(worker => worker.worker_id))
       const missingSeedWorkers = initial.workers.filter(worker => !savedWorkerIds.has(worker.worker_id))
+      const savedHazardIds = new Set((restored.hazards || []).map(hazard => hazard.id))
+      const missingSeedHazards = initial.hazards.filter(hazard => !savedHazardIds.has(hazard.id))
       const workersWithReadState = (restored.workers || []).map((worker, index) => worker.read === undefined
         ? { ...worker, read: ((Number(worker.id) || index) * 9301 + 49297) % 233280 / 233280 < 0.5 }
         : worker)
-      if (missingSeedWorkers.length || workersWithReadState.some((worker, index) => worker !== restored.workers[index])) {
+      if (missingSeedWorkers.length || missingSeedHazards.length || workersWithReadState.some((worker, index) => worker !== restored.workers[index])) {
         restored.workers = [...workersWithReadState, ...missingSeedWorkers]
+        restored.hazards = [...(restored.hazards || []), ...missingSeedHazards]
         localStorage.setItem(STORAGE_KEY, JSON.stringify(restored))
       }
       return restored
