@@ -27,7 +27,7 @@ const additionalWorkers = [
   ['1321','Saanvi Kapoor','Ventilation Assistant','F','Day','N. Sharma','South Return Muster'],
   ['1322','Dhruv Bose','Haulage Operator','F','Night','N. Sharma','South Return Muster'],
   ['1323','Meera Iyer','Safety Assistant','F','Day','N. Sharma','South Return Muster'],
-].map(([workerId,name,designation,tunnel,shift,supervisor,muster],index)=>({id:5+index,worker_id:`JCF-${workerId}`,name,designation,tunnel,shift,supervisor,emergency_contact:`+91 90000 ${20104+index}`,muster}))
+].map(([workerId,name,designation,tunnel,shift,supervisor,muster],index)=>({id:5+index,worker_id:`JCF-${workerId}`,name,designation,tunnel,shift,supervisor,emergency_contact:`+91 90000 ${20104+index}`,muster,read:[true,false,false,true,false,true,false][index%7]}))
 
 const initial: Store = {
   mines: [{ id: 1, name: 'Jharia Coalfield', code: 'JCF-01' }],
@@ -64,10 +64,10 @@ const initial: Store = {
     { id: 2, title: 'Water accumulation at crosscut', category: 'Housekeeping', description: 'Illustrative fictional hazard record.', tunnel: 'D', priority: 'Medium', reporter: 'M. Ali', assigned: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'Assigned' },
   ],
   workers: [
-    { id: 1, worker_id: 'JCF-1042', name: 'Arjun Mehta', designation: 'Mining Supervisor', tunnel: 'A', shift: 'Day', supervisor: 'A. Kumar', emergency_contact: '+91 90000 10042', muster: 'North Muster Point' },
-    { id: 2, worker_id: 'JCF-1088', name: 'Sana Khan', designation: 'Ventilation Technician', tunnel: 'B', shift: 'Day', supervisor: 'S. Das', emergency_contact: '+91 90000 10088', muster: 'East Muster Point' },
-    { id: 3, worker_id: 'JCF-1116', name: 'Dev Patel', designation: 'Electrical Technician', tunnel: 'C', shift: 'Night', supervisor: 'R. Singh', emergency_contact: '+91 90000 10116', muster: 'Central Muster Point' },
-    { id: 4, worker_id: 'JCF-1201', name: 'Mira Das', designation: 'Safety Officer', tunnel: 'E', shift: 'Day', supervisor: 'P. Roy', emergency_contact: '+91 90000 10201', muster: 'South Muster Point' },
+    { id: 1, worker_id: 'JCF-1042', name: 'Arjun Mehta', designation: 'Mining Supervisor', tunnel: 'A', shift: 'Day', supervisor: 'A. Kumar', emergency_contact: '+91 90000 10042', muster: 'North Muster Point', read: true },
+    { id: 2, worker_id: 'JCF-1088', name: 'Sana Khan', designation: 'Ventilation Technician', tunnel: 'B', shift: 'Day', supervisor: 'S. Das', emergency_contact: '+91 90000 10088', muster: 'East Muster Point', read: false },
+    { id: 3, worker_id: 'JCF-1116', name: 'Dev Patel', designation: 'Electrical Technician', tunnel: 'C', shift: 'Night', supervisor: 'R. Singh', emergency_contact: '+91 90000 10116', muster: 'Central Muster Point', read: true },
+    { id: 4, worker_id: 'JCF-1201', name: 'Mira Das', designation: 'Safety Officer', tunnel: 'E', shift: 'Day', supervisor: 'P. Roy', emergency_contact: '+91 90000 10201', muster: 'South Muster Point', read: false },
     ...additionalWorkers,
   ],
   inspections: [
@@ -90,8 +90,11 @@ function readStore(): Store {
       const restored = { ...structuredClone(initial), ...JSON.parse(saved) } as Store
       const savedWorkerIds = new Set((restored.workers || []).map(worker => worker.worker_id))
       const missingSeedWorkers = initial.workers.filter(worker => !savedWorkerIds.has(worker.worker_id))
-      if (missingSeedWorkers.length) {
-        restored.workers = [...(restored.workers || []), ...missingSeedWorkers]
+      const workersWithReadState = (restored.workers || []).map((worker, index) => worker.read === undefined
+        ? { ...worker, read: ((Number(worker.id) || index) * 9301 + 49297) % 233280 / 233280 < 0.5 }
+        : worker)
+      if (missingSeedWorkers.length || workersWithReadState.some((worker, index) => worker !== restored.workers[index])) {
+        restored.workers = [...workersWithReadState, ...missingSeedWorkers]
         localStorage.setItem(STORAGE_KEY, JSON.stringify(restored))
       }
       return restored
