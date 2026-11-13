@@ -78,6 +78,11 @@ const initial: Store = {
   inspections: [
     { id: 1, title: 'Weekly ventilation walkthrough', tunnel: 'B', inspector: 'S. Das', date: new Date(Date.now() + 86400000).toISOString().slice(0, 10), status: 'Scheduled', findings: '', corrective_action: '' },
     { id: 2, title: 'Ground support review', tunnel: 'E', inspector: 'P. Roy', date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'Demo follow-up required', corrective_action: 'Review support plan' },
+    { id: 3, title: 'Pre-shift ventilation and airflow survey', tunnel: 'A', inspector: 'A. Kumar', date: new Date(Date.now() + 86400000).toISOString().slice(0, 10), status: 'Scheduled', findings: 'Check airflow readings at the working face and confirm auxiliary duct continuity.', corrective_action: 'Record readings and assign any ventilation adjustment before the next shift.' },
+    { id: 4, title: 'Roof bolt and strata condition examination', tunnel: 'C', inspector: 'R. Singh', date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'One support point needs a closer visual check; no real site condition is represented by this demo record.', corrective_action: 'Keep the marked bay under review and document support verification.' },
+    { id: 5, title: 'Crosscut drainage and pump function check', tunnel: 'D', inspector: 'M. Ali', date: new Date().toISOString().slice(0, 10), status: 'In Progress', findings: 'Inspect the crosscut for water accumulation and verify the simulated pump checklist.', corrective_action: 'Clear any obstruction and record pump status in the next handover.' },
+    { id: 6, title: 'Electrical cable and equipment isolation audit', tunnel: 'E', inspector: 'P. Roy', date: new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 10), status: 'Scheduled', findings: 'Review cable condition, isolation tags and the equipment inspection register.', corrective_action: 'Log defects and route items requiring repair to the electrical supervisor.' },
+    { id: 7, title: 'Emergency egress and wayfinding review', tunnel: 'F', inspector: 'N. Sharma', date: new Date().toISOString().slice(0, 10), status: 'Findings Recorded', findings: 'Check that the illustrative egress route is clear and route markers remain visible.', corrective_action: 'Record clearance confirmation and update the shift briefing notes.' },
   ],
   compliance: [
     { id: 1, title: 'Ventilation inspection log review', category: 'Internal checklist', owner: 'A. Kumar', due: new Date(Date.now() + 86400000 * 4).toISOString().slice(0, 10), priority: 'High', status: 'Pending' },
@@ -97,12 +102,15 @@ function readStore(): Store {
       const missingSeedWorkers = initial.workers.filter(worker => !savedWorkerIds.has(worker.worker_id))
       const savedHazardIds = new Set((restored.hazards || []).map(hazard => hazard.id))
       const missingSeedHazards = initial.hazards.filter(hazard => !savedHazardIds.has(hazard.id))
+      const savedInspectionIds = new Set((restored.inspections || []).map(inspection => inspection.id))
+      const missingSeedInspections = initial.inspections.filter(inspection => !savedInspectionIds.has(inspection.id))
       const workersWithReadState = (restored.workers || []).map((worker, index) => worker.read === undefined
         ? { ...worker, read: ((Number(worker.id) || index) * 9301 + 49297) % 233280 / 233280 < 0.5 }
         : worker)
-      if (missingSeedWorkers.length || missingSeedHazards.length || workersWithReadState.some((worker, index) => worker !== restored.workers[index])) {
+      if (missingSeedWorkers.length || missingSeedHazards.length || missingSeedInspections.length || workersWithReadState.some((worker, index) => worker !== restored.workers[index])) {
         restored.workers = [...workersWithReadState, ...missingSeedWorkers]
         restored.hazards = [...(restored.hazards || []), ...missingSeedHazards]
+        restored.inspections = [...(restored.inspections || []), ...missingSeedInspections]
         localStorage.setItem(STORAGE_KEY, JSON.stringify(restored))
       }
       return restored
