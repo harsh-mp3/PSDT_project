@@ -6,6 +6,29 @@ const HISTORY_KEY = `${STORAGE_KEY}-sensor-history`
 type Store = Record<Resource, Row[]>
 type ReadingSample = { id: string; tunnel: string; sensor: string; value: number; time: string }
 
+const additionalWorkers = [
+  ['1304','Rohan Kumar','Roof Support Technician','A','Day','A. Kumar','North Muster Point'],
+  ['1305','Isha Verma','Survey Assistant','A','Night','A. Kumar','North Muster Point'],
+  ['1306','Kabir Singh','Drill Operator','A','Day','A. Kumar','North Muster Point'],
+  ['1307','Tara Joshi','First Aid Responder','A','Night','A. Kumar','North Muster Point'],
+  ['1308','Aarav Das','Ventilation Technician','B','Night','S. Das','East Muster Point'],
+  ['1309','Nisha Roy','Electrical Technician','B','Day','S. Das','East Muster Point'],
+  ['1310','Vivaan Shah','Roof Support Technician','B','Night','S. Das','East Muster Point'],
+  ['1311','Anaya Patel','Mine Surveyor','B','Day','S. Das','East Muster Point'],
+  ['1312','Reyansh Gupta','Longwall Operator','C','Day','R. Singh','Central Muster Point'],
+  ['1313','Diya Nair','Equipment Technician','C','Night','R. Singh','Central Muster Point'],
+  ['1314','Aditya Rao','Emergency Response Officer','C','Day','R. Singh','Central Muster Point'],
+  ['1315','Myra Khan','Conveyor Operator','D','Day','M. Ali','West Muster Point'],
+  ['1316','Arnav Mehta','Ground Control Technician','D','Night','M. Ali','West Muster Point'],
+  ['1317','Kiara Sen','First Aid Responder','D','Day','M. Ali','West Muster Point'],
+  ['1318','Ishaan Roy','Methane Monitoring Technician','E','Night','P. Roy','South Muster Point'],
+  ['1319','Aditi Sharma','Pump Operator','E','Day','P. Roy','South Muster Point'],
+  ['1320','Krish Malhotra','Mine Electrician','E','Night','P. Roy','South Muster Point'],
+  ['1321','Saanvi Kapoor','Ventilation Assistant','F','Day','N. Sharma','South Return Muster'],
+  ['1322','Dhruv Bose','Haulage Operator','F','Night','N. Sharma','South Return Muster'],
+  ['1323','Meera Iyer','Safety Assistant','F','Day','N. Sharma','South Return Muster'],
+].map(([workerId,name,designation,tunnel,shift,supervisor,muster],index)=>({id:5+index,worker_id:`JCF-${workerId}`,name,designation,tunnel,shift,supervisor,emergency_contact:`+91 90000 ${20104+index}`,muster}))
+
 const initial: Store = {
   mines: [{ id: 1, name: 'Jharia Coalfield', code: 'JCF-01' }],
   tunnels: [
@@ -45,6 +68,7 @@ const initial: Store = {
     { id: 2, worker_id: 'JCF-1088', name: 'Sana Khan', designation: 'Ventilation Technician', tunnel: 'B', shift: 'Day', supervisor: 'S. Das', emergency_contact: '+91 90000 10088', muster: 'East Muster Point' },
     { id: 3, worker_id: 'JCF-1116', name: 'Dev Patel', designation: 'Electrical Technician', tunnel: 'C', shift: 'Night', supervisor: 'R. Singh', emergency_contact: '+91 90000 10116', muster: 'Central Muster Point' },
     { id: 4, worker_id: 'JCF-1201', name: 'Mira Das', designation: 'Safety Officer', tunnel: 'E', shift: 'Day', supervisor: 'P. Roy', emergency_contact: '+91 90000 10201', muster: 'South Muster Point' },
+    ...additionalWorkers,
   ],
   inspections: [
     { id: 1, title: 'Weekly ventilation walkthrough', tunnel: 'B', inspector: 'S. Das', date: new Date(Date.now() + 86400000).toISOString().slice(0, 10), status: 'Scheduled', findings: '', corrective_action: '' },
@@ -62,7 +86,16 @@ const initial: Store = {
 function readStore(): Store {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) return { ...structuredClone(initial), ...JSON.parse(saved) }
+    if (saved) {
+      const restored = { ...structuredClone(initial), ...JSON.parse(saved) } as Store
+      const savedWorkerIds = new Set((restored.workers || []).map(worker => worker.worker_id))
+      const missingSeedWorkers = initial.workers.filter(worker => !savedWorkerIds.has(worker.worker_id))
+      if (missingSeedWorkers.length) {
+        restored.workers = [...(restored.workers || []), ...missingSeedWorkers]
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(restored))
+      }
+      return restored
+    }
   } catch { /* Use the seed data if browser storage is unavailable or malformed. */ }
   return structuredClone(initial)
 }
